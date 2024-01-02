@@ -1433,13 +1433,7 @@ FS_FindVM
 
 Find a suitable VM file in search path order.
 
-In each searchpath try:
- - open DLL file if DLL loading enabled
- - open QVM file
-
-Enable search for DLL by setting enableDll to FSVM_ENABLEDLL
-
-write found DLL or QVM to "found" and return VMI_NATIVE if DLL, VMI_COMPILED if QVM
+Write found DLL to "found" and return VMI_NATIVE.
 Return the searchpath in "startSearch".
 =================
 */
@@ -1448,17 +1442,15 @@ int FS_FindVM(void **startSearch, char *found, int foundlen, const char *name, i
 {
 	searchpath_t *search, *lastSearch;
 	directory_t *dir;
-	pack_t *pack;
-	char dllName[MAX_OSPATH], qvmName[MAX_OSPATH];
+	char dllName[MAX_OSPATH];
 	char *netpath;
+
+	(void) &enableDll;
 
 	if(!fs_searchpaths)
 		Com_Error(ERR_FATAL, "Filesystem call made without initialization");
 
-	if(enableDll)
-		Com_sprintf(dllName, sizeof(dllName), "%s" ARCH_STRING DLL_EXT, name);
-
-	Com_sprintf(qvmName, sizeof(qvmName), "vm/%s.qvm", name);
+	Com_sprintf(dllName, sizeof(dllName), "%s" ARCH_STRING DLL_EXT, name);
 
 	lastSearch = *startSearch;
 	if(*startSearch == NULL)
@@ -1468,53 +1460,19 @@ int FS_FindVM(void **startSearch, char *found, int foundlen, const char *name, i
 
 	while(search)
 	{
-		if(search->dir && !fs_numServerPaks)
+		if(search->dir)
 		{
 			dir = search->dir;
+			netpath = FS_BuildOSPath(dir->path, dir->gamedir, dllName);
 
-			if(enableDll)
+			if(FS_FileInPathExists(netpath))
 			{
-				netpath = FS_BuildOSPath(dir->path, dir->gamedir, dllName);
-
-				if(FS_FileInPathExists(netpath))
-				{
-					Q_strncpyz(found, netpath, foundlen);
-					*startSearch = search;
-
-					return VMI_NATIVE;
-				}
-			}
-
-			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse, qfalse) > 0)
-			{
-				*startSearch = search;
-				return VMI_COMPILED;
-			}
-		}
-		else if(search->pack)
-		{
-			pack = search->pack;
-
-			if(lastSearch && lastSearch->pack)
-			{
-				// make sure we only try loading one VM file per game dir
-				// i.e. if VM from pak7.pk3 fails we won't try one from pak6.pk3
-
-				if(!FS_FilenameCompare(lastSearch->pack->pakPathname, pack->pakPathname))
-				{
-					search = search->next;
-					continue;
-				}
-			}
-
-			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse, qfalse) > 0)
-			{
+				Q_strncpyz(found, netpath, foundlen);
 				*startSearch = search;
 
-				return VMI_COMPILED;
+				return VMI_NATIVE;
 			}
 		}
-
 		search = search->next;
 	}
 
