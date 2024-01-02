@@ -1047,6 +1047,7 @@ void GfxInfo_f( void )
 	ri.Printf( PRINT_ALL, "\nGL_VENDOR: %s\n", glConfig.vendor_string );
 	ri.Printf( PRINT_ALL, "GL_RENDERER: %s\n", glConfig.renderer_string );
 	ri.Printf( PRINT_ALL, "GL_VERSION: %s\n", glConfig.version_string );
+#if 0
 	ri.Printf( PRINT_ALL, "GL_EXTENSIONS: " );
 	// glConfig.extensions_string is a limited length so get the full list directly
 	if ( qglGetStringi )
@@ -1064,6 +1065,7 @@ void GfxInfo_f( void )
 	{
 		R_PrintLongString( (char *) qglGetString( GL_EXTENSIONS ) );
 	}
+#endif
 	ri.Printf( PRINT_ALL, "\n" );
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %d\n", glConfig.maxTextureSize );
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_IMAGE_UNITS: %d\n", glConfig.numTextureUnits );
