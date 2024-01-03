@@ -222,11 +222,12 @@ CG_OffsetThirdPersonView
 
 ===============
 */
-#define	FOCUS_DISTANCE	512
 static void CG_OffsetThirdPersonView( void ) {
-	VectorClear(cg.refdefViewAngles);
-	VectorClear(cg.refdef.vieworg);
-	cg.refdefViewAngles[1] = 90;
+	cg.refdefViewAngles[PITCH]	= 0;
+	cg.refdefViewAngles[YAW]	= 90;
+	cg.refdefViewAngles[ROLL]	= 0;
+
+	VectorCopy(cg.predictedPlayerState.origin, cg.refdef.vieworg);
 	cg.refdef.vieworg[1] = -256;
 }
 
