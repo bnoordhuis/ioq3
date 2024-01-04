@@ -223,11 +223,17 @@ CG_OffsetThirdPersonView
 ===============
 */
 static void CG_OffsetThirdPersonView( void ) {
+	playerState_t *ps = &cg.predictedPlayerState;
+	int dir = ps->movementDir;
+
+	VectorClear(ps->viewangles);
+	ps->viewangles[YAW] = -180 * (dir > 0 && dir < 4);
+
 	cg.refdefViewAngles[PITCH]	= 0;
 	cg.refdefViewAngles[YAW]	= 90;
 	cg.refdefViewAngles[ROLL]	= 0;
 
-	VectorCopy(cg.predictedPlayerState.origin, cg.refdef.vieworg);
+	VectorCopy(ps->origin, cg.refdef.vieworg);
 	cg.refdef.vieworg[1] = -256;
 }
 
