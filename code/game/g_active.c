@@ -236,6 +236,7 @@ Spectators will only interact with teleporters.
 void	G_TouchTriggers( gentity_t *ent ) {
 	int			i, num;
 	int			touch[MAX_GENTITIES];
+	playerState_t	*ps;
 	gentity_t	*hit;
 	trace_t		trace;
 	vec3_t		mins, maxs;
@@ -245,19 +246,21 @@ void	G_TouchTriggers( gentity_t *ent ) {
 		return;
 	}
 
+	ps = &ent->client->ps;
+
 	// dead clients don't activate triggers!
-	if ( ent->client->ps.stats[STAT_HEALTH] <= 0 ) {
+	if ( ps->stats[STAT_HEALTH] <= 0 ) {
 		return;
 	}
 
-	VectorSubtract( ent->client->ps.origin, range, mins );
-	VectorAdd( ent->client->ps.origin, range, maxs );
+	VectorSubtract( ps->origin, range, mins );
+	VectorAdd( ps->origin, range, maxs );
 
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 	// can't use ent->absmin, because that has a one unit pad
-	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
-	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+	VectorAdd( ps->origin, ent->r.mins, mins );
+	VectorAdd( ps->origin, ent->r.maxs, maxs );
 
 	for ( i=0 ; i<num ; i++ ) {
 		hit = &g_entities[touch[i]];
@@ -282,14 +285,16 @@ void	G_TouchTriggers( gentity_t *ent ) {
 		// use separate code for determining if an item is picked up
 		// so you don't have to actually contact its bounding box
 		if ( hit->s.eType == ET_ITEM ) {
-			if ( !BG_PlayerTouchesItem( &ent->client->ps, &hit->s, level.time ) ) {
+			if ( !BG_PlayerTouchesItem( ps, &hit->s, level.time ) ) {
+				continue;
+			}
+		} else if ( hit->s.eType == ET_UPSIDEDOWN_TRIGGER ) {
+			if ( !trap_EntityContact( mins, maxs, hit ) ) {
+				ps->pm_flags &= ~PMF_UPSIDEDOWN;
 				continue;
 			}
 		} else {
 			if ( !trap_EntityContact( mins, maxs, hit ) ) {
-				if ( hit->s.eType == ET_UPSIDEDOWN_TRIGGER ) {
-					ent->client->ps.pm_flags &= ~PMF_UPSIDEDOWN;
-				}
 				continue;
 			}
 		}
@@ -306,9 +311,9 @@ void	G_TouchTriggers( gentity_t *ent ) {
 	}
 
 	// if we didn't touch a jump pad this pmove frame
-	if ( ent->client->ps.jumppad_frame != ent->client->ps.pmove_framecount ) {
-		ent->client->ps.jumppad_frame = 0;
-		ent->client->ps.jumppad_ent = 0;
+	if ( ps->jumppad_frame != ps->pmove_framecount ) {
+		ps->jumppad_frame = 0;
+		ps->jumppad_ent = 0;
 	}
 }
 
