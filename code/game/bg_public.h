@@ -153,6 +153,7 @@ typedef enum {
 #define PMF_FOLLOW			4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
+#define PMF_UPSIDEDOWN		0x8000
 
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
@@ -262,6 +263,7 @@ typedef enum {
 #define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
 #define EF_AWARD_DENIED		0x00040000		// denied
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
+#define EF_UPSIDEDOWN		0x00100000
 
 // NOTE: may not have more than 16
 typedef enum {
@@ -682,6 +684,7 @@ typedef enum {
 	ET_SPEAKER,
 	ET_PUSH_TRIGGER,
 	ET_TELEPORT_TRIGGER,
+	ET_UPSIDEDOWN_TRIGGER,
 	ET_INVISIBLE,
 	ET_GRAPPLE,				// grapple hooked on wall
 	ET_TEAM,

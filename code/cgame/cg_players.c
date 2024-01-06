@@ -2310,7 +2310,8 @@ void CG_Player( centity_t *cent ) {
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
 
-	if ( cent->pe.upsidedown ) {
+	// FIXME(bnoordhuis) look at cent, not cg.snap
+	if ( cg.snap->ps.pm_flags & PMF_UPSIDEDOWN ) {
 		VectorNegate( legs.axis[2], legs.axis[2] );
 	}
 

@@ -287,6 +287,9 @@ void	G_TouchTriggers( gentity_t *ent ) {
 			}
 		} else {
 			if ( !trap_EntityContact( mins, maxs, hit ) ) {
+				if ( hit->s.eType == ET_UPSIDEDOWN_TRIGGER ) {
+					ent->client->ps.pm_flags &= ~PMF_UPSIDEDOWN;
+				}
 				continue;
 			}
 		}
@@ -836,6 +839,10 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	client->ps.gravity = g_gravity.value;
+
+	if ( client->ps.pm_flags & PMF_UPSIDEDOWN ) {
+		client->ps.gravity *= -1;
+	}
 
 	// set speed
 	client->ps.speed = g_speed.value;

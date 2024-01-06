@@ -357,6 +357,9 @@ void	Svcmd_EntityList_f (void) {
 		case ET_TELEPORT_TRIGGER:
 			G_Printf("ET_TELEPORT_TRIGGER ");
 			break;
+		case ET_UPSIDEDOWN_TRIGGER:
+			G_Printf("ET_UPSIDEDOWN_TRIGGER ");
+			break;
 		case ET_INVISIBLE:
 			G_Printf("ET_INVISIBLE        ");
 			break;

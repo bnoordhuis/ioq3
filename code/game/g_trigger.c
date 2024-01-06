@@ -402,6 +402,20 @@ void SP_trigger_hurt( gentity_t *self ) {
 }
 
 
+void trigger_upsidedown_touch (gentity_t *self, gentity_t *other, trace_t *trace ) {
+	if ( other->client ) {
+		other->client->ps.pm_flags |= PMF_UPSIDEDOWN;
+	}
+}
+
+
+void SP_trigger_upsidedown( gentity_t *self ) {
+	InitTrigger (self);
+	self->s.eType = ET_UPSIDEDOWN_TRIGGER;
+	self->touch = trigger_upsidedown_touch;
+	trap_LinkEntity (self);
+}
+
 /*
 ==============================================================================
 
