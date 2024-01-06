@@ -64,7 +64,6 @@ tag location
 */
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
 							qhandle_t parentModel, char *tagName ) {
-	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
 
@@ -75,9 +74,9 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
-	for ( i = 0 ; i < 3 ; i++ ) {
-		VectorMA( entity->origin, lerped.origin[i], parent->axis[i], entity->origin );
-	}
+	VectorMA( entity->origin, lerped.origin[0], parent->axis[0], entity->origin );
+	VectorMA( entity->origin, lerped.origin[1], parent->axis[1], entity->origin );
+	VectorMA( entity->origin, lerped.origin[2], parent->axis[2], entity->origin );
 
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( entity->axis, lerped.axis, tempAxis );
