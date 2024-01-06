@@ -239,7 +239,6 @@ Handles user intended acceleration
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 #if 1
 	// q2 style
-	int			i;
 	float		addspeed, accelspeed, currentspeed;
 
 	currentspeed = DotProduct (pm->ps->velocity, wishdir);
@@ -251,10 +250,10 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 	if (accelspeed > addspeed) {
 		accelspeed = addspeed;
 	}
-	
-	for (i=0 ; i<3 ; i++) {
-		pm->ps->velocity[i] += accelspeed*wishdir[i];	
-	}
+
+	pm->ps->velocity[0] += accelspeed*wishdir[0];
+	pm->ps->velocity[1] += accelspeed*wishdir[1];
+	pm->ps->velocity[2] += accelspeed*wishdir[2];
 #else
 	// proper way (avoids strafe jump maxspeed bug), but feels bad
 	vec3_t		wishVelocity;
@@ -377,7 +376,11 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
-	pm->ps->velocity[2] = JUMP_VELOCITY;
+	if ( pm->ps->pm_flags & PMF_UPSIDEDOWN ) {
+		pm->ps->velocity[2] = -JUMP_VELOCITY;
+	} else {
+		pm->ps->velocity[2] = JUMP_VELOCITY;
+	}
 	PM_AddEvent( EV_JUMP );
 
 	if ( pm->cmd.forwardmove >= 0 ) {
@@ -598,7 +601,6 @@ PM_AirMove
 ===================
 */
 static void PM_AirMove( void ) {
-	int			i;
 	vec3_t		wishvel;
 	float		fmove, smove;
 	vec3_t		wishdir;
@@ -623,9 +625,8 @@ static void PM_AirMove( void ) {
 	VectorNormalize (pml.forward);
 	VectorNormalize (pml.right);
 
-	for ( i = 0 ; i < 2 ; i++ ) {
-		wishvel[i] = pml.forward[i]*fmove + pml.right[i]*smove;
-	}
+	wishvel[0] = pml.forward[0]*fmove + pml.right[0]*smove;
+	wishvel[1] = pml.forward[1]*fmove + pml.right[1]*smove;
 	wishvel[2] = 0;
 
 	VectorCopy (wishvel, wishdir);
@@ -1106,10 +1107,17 @@ PM_GroundTrace
 static void PM_GroundTrace( void ) {
 	vec3_t		point;
 	trace_t		trace;
+	qboolean	upsidedown;
+	float		zdir;
 
-	point[0] = pm->ps->origin[0];
-	point[1] = pm->ps->origin[1];
-	point[2] = pm->ps->origin[2] - 0.25;
+	zdir = -1;
+	upsidedown = ( pm->ps->pm_flags & PMF_UPSIDEDOWN );
+	if ( upsidedown ) {
+		zdir = 1;
+	}
+
+	VectorCopy( pm->ps->origin, point );
+	point[2] += 0.25 * zdir;
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
 	pml.groundTrace = trace;
@@ -1147,9 +1155,9 @@ static void PM_GroundTrace( void ) {
 		pml.walking = qfalse;
 		return;
 	}
-	
+
 	// slopes that are too steep will not be considered onground
-	if ( trace.plane.normal[2] < MIN_WALK_NORMAL ) {
+	if ( -1 * zdir * trace.plane.normal[2] < MIN_WALK_NORMAL ) {
 		if ( pm->debugLevel ) {
 			Com_Printf("%i:steep\n", c_pmove);
 		}
@@ -1270,7 +1278,6 @@ static void PM_CheckDuck (void)
 
 	pm->maxs[0] = 15;
 	pm->maxs[1] = 15;
-
 	pm->mins[2] = MINS_Z;
 
 	if (pm->ps->pm_type == PM_DEAD)
@@ -1303,7 +1310,7 @@ static void PM_CheckDuck (void)
 	}
 	else
 	{
-		pm->maxs[2] = 32;
+		pm->maxs[2] = MINS_Z * -1;
 		pm->ps->viewheight = DEFAULT_VIEWHEIGHT;
 	}
 }

@@ -840,10 +840,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 	client->ps.gravity = g_gravity.value;
 
-	if ( client->ps.pm_flags & PMF_UPSIDEDOWN ) {
-		client->ps.gravity *= -1;
-	}
-
 	// set speed
 	client->ps.speed = g_speed.value;
 

@@ -55,16 +55,23 @@ qboolean	PM_SlideMove( qboolean gravity ) {
 	vec3_t		end;
 	float		time_left;
 	float		into;
+	float		zdir;
 	vec3_t		endVelocity;
 	vec3_t		endClipVelocity;
-	
+	qboolean	upsidedown;
+
+	zdir = -1;
 	numbumps = 4;
+	upsidedown = ( pm->ps->pm_flags & PMF_UPSIDEDOWN );
+	if ( upsidedown ) {
+		zdir = 1;
+	}
 
 	VectorCopy (pm->ps->velocity, primal_velocity);
 
 	if ( gravity ) {
 		VectorCopy( pm->ps->velocity, endVelocity );
-		endVelocity[2] -= pm->ps->gravity * pml.frametime;
+		endVelocity[2] += pm->ps->gravity * pml.frametime * zdir;
 		pm->ps->velocity[2] = ( pm->ps->velocity[2] + endVelocity[2] ) * 0.5;
 		primal_velocity[2] = endVelocity[2];
 		if ( pml.groundPlane ) {
