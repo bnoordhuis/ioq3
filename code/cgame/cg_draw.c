@@ -2519,7 +2519,7 @@ void CG_DrawTimedMenus( void ) {
 CG_Draw2D
 =================
 */
-static void CG_Draw2D(stereoFrame_t stereoFrame)
+void CG_Draw2D(stereoFrame_t stereoFrame) // TODO(bnoordhuis) remove
 {
 #ifdef MISSIONPACK
 	if (cgs.orderPending && cg.time > cgs.orderTime) {
