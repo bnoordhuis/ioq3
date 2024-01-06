@@ -669,15 +669,8 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// add the disconnect command
 	SV_SendServerCommand( drop, "disconnect \"%s\"", reason);
 
-	if ( isBot ) {
-		SV_BotFreeClient( drop - svs.clients );
-
-		// bots shouldn't go zombie, as there's no real net connection.
-		drop->state = CS_FREE;
-	} else {
-		Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name );
-		drop->state = CS_ZOMBIE;		// become free in a few seconds
-	}
+	Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name );
+	drop->state = CS_ZOMBIE;		// become free in a few seconds
 
 	// nuke user info
 	SV_SetUserinfo( drop - svs.clients, "" );

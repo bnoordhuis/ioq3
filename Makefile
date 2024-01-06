@@ -262,7 +262,6 @@ ASMDIR=$(MOUNT_DIR)/asm
 SYSDIR=$(MOUNT_DIR)/sys
 GDIR=$(MOUNT_DIR)/game
 CGDIR=$(MOUNT_DIR)/cgame
-BLIBDIR=$(MOUNT_DIR)/botlib
 NDIR=$(MOUNT_DIR)/null
 UIDIR=$(MOUNT_DIR)/ui
 Q3UIDIR=$(MOUNT_DIR)/q3_ui
@@ -1033,8 +1032,6 @@ ifeq ($(PLATFORM),sunos)
   LIBS=-lsocket -lnsl -ldl -lm
   AUTOUPDATER_LIBS += -ldl
 
-  BOTCFLAGS=-O0
-
   CLIENT_LIBS +=$(SDL_LIBS) -lX11 -lXext -liconv -lm
   RENDERER_LIBS = $(SDL_LIBS)
 
@@ -1319,11 +1316,6 @@ define DO_REF_STR
 $(echo_cmd) "REF_STR $<"
 $(Q)rm -f $@
 $(Q)$(STRINGIFY) $< $@
-endef
-
-define DO_BOT_CC
-$(echo_cmd) "BOT_CC $<"
-$(Q)$(CC) $(NOTSHLIBCFLAGS) $(CFLAGS) $(BOTCFLAGS) $(OPTIMIZE) -DBOTLIB -o $@ -c $<
 endef
 
 ifeq ($(GENERATE_DEPENDENCIES),1)
@@ -1810,7 +1802,6 @@ Q3OBJ = \
   \
   $(B)/client/cl_curl.o \
   \
-  $(B)/client/sv_bot.o \
   $(B)/client/sv_ccmds.o \
   $(B)/client/sv_client.o \
   $(B)/client/sv_game.o \
@@ -1828,35 +1819,6 @@ Q3OBJ = \
   $(B)/client/puff.o \
   $(B)/client/vm.o \
   $(B)/client/vm_interpreted.o \
-  \
-  $(B)/client/be_aas_bspq3.o \
-  $(B)/client/be_aas_cluster.o \
-  $(B)/client/be_aas_debug.o \
-  $(B)/client/be_aas_entity.o \
-  $(B)/client/be_aas_file.o \
-  $(B)/client/be_aas_main.o \
-  $(B)/client/be_aas_move.o \
-  $(B)/client/be_aas_optimize.o \
-  $(B)/client/be_aas_reach.o \
-  $(B)/client/be_aas_route.o \
-  $(B)/client/be_aas_routealt.o \
-  $(B)/client/be_aas_sample.o \
-  $(B)/client/be_ai_char.o \
-  $(B)/client/be_ai_chat.o \
-  $(B)/client/be_ai_gen.o \
-  $(B)/client/be_ai_goal.o \
-  $(B)/client/be_ai_move.o \
-  $(B)/client/be_ai_weap.o \
-  $(B)/client/be_ai_weight.o \
-  $(B)/client/be_ea.o \
-  $(B)/client/be_interface.o \
-  $(B)/client/l_crc.o \
-  $(B)/client/l_libvar.o \
-  $(B)/client/l_log.o \
-  $(B)/client/l_memory.o \
-  $(B)/client/l_precomp.o \
-  $(B)/client/l_script.o \
-  $(B)/client/l_struct.o \
   \
   $(B)/client/sdl_input.o \
   $(B)/client/sdl_snd.o \
@@ -2335,7 +2297,6 @@ endif
 #############################################################################
 
 Q3DOBJ = \
-  $(B)/ded/sv_bot.o \
   $(B)/ded/sv_client.o \
   $(B)/ded/sv_ccmds.o \
   $(B)/ded/sv_game.o \
@@ -2367,35 +2328,6 @@ Q3DOBJ = \
   $(B)/ded/ioapi.o \
   $(B)/ded/vm.o \
   $(B)/ded/vm_interpreted.o \
-  \
-  $(B)/ded/be_aas_bspq3.o \
-  $(B)/ded/be_aas_cluster.o \
-  $(B)/ded/be_aas_debug.o \
-  $(B)/ded/be_aas_entity.o \
-  $(B)/ded/be_aas_file.o \
-  $(B)/ded/be_aas_main.o \
-  $(B)/ded/be_aas_move.o \
-  $(B)/ded/be_aas_optimize.o \
-  $(B)/ded/be_aas_reach.o \
-  $(B)/ded/be_aas_route.o \
-  $(B)/ded/be_aas_routealt.o \
-  $(B)/ded/be_aas_sample.o \
-  $(B)/ded/be_ai_char.o \
-  $(B)/ded/be_ai_chat.o \
-  $(B)/ded/be_ai_gen.o \
-  $(B)/ded/be_ai_goal.o \
-  $(B)/ded/be_ai_move.o \
-  $(B)/ded/be_ai_weap.o \
-  $(B)/ded/be_ai_weight.o \
-  $(B)/ded/be_ea.o \
-  $(B)/ded/be_interface.o \
-  $(B)/ded/l_crc.o \
-  $(B)/ded/l_libvar.o \
-  $(B)/ded/l_log.o \
-  $(B)/ded/l_memory.o \
-  $(B)/ded/l_precomp.o \
-  $(B)/ded/l_script.o \
-  $(B)/ded/l_struct.o \
   \
   $(B)/ded/null_client.o \
   $(B)/ded/null_input.o \
@@ -2561,20 +2493,12 @@ $(B)/$(MISSIONPACK)/vm/cgame.qvm: $(MPCGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 
 Q3GOBJ_ = \
   $(B)/$(BASEGAME)/game/g_main.o \
-  $(B)/$(BASEGAME)/game/ai_chat.o \
-  $(B)/$(BASEGAME)/game/ai_cmd.o \
-  $(B)/$(BASEGAME)/game/ai_dmnet.o \
-  $(B)/$(BASEGAME)/game/ai_dmq3.o \
-  $(B)/$(BASEGAME)/game/ai_main.o \
-  $(B)/$(BASEGAME)/game/ai_team.o \
-  $(B)/$(BASEGAME)/game/ai_vcmd.o \
   $(B)/$(BASEGAME)/game/bg_misc.o \
   $(B)/$(BASEGAME)/game/bg_pmove.o \
   $(B)/$(BASEGAME)/game/bg_slidemove.o \
   $(B)/$(BASEGAME)/game/bg_lib.o \
   $(B)/$(BASEGAME)/game/g_active.o \
   $(B)/$(BASEGAME)/game/g_arenas.o \
-  $(B)/$(BASEGAME)/game/g_bot.o \
   $(B)/$(BASEGAME)/game/g_client.o \
   $(B)/$(BASEGAME)/game/g_cmds.o \
   $(B)/$(BASEGAME)/game/g_combat.o \
@@ -2612,20 +2536,12 @@ $(B)/$(BASEGAME)/vm/qagame.qvm: $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 
 MPGOBJ_ = \
   $(B)/$(MISSIONPACK)/game/g_main.o \
-  $(B)/$(MISSIONPACK)/game/ai_chat.o \
-  $(B)/$(MISSIONPACK)/game/ai_cmd.o \
-  $(B)/$(MISSIONPACK)/game/ai_dmnet.o \
-  $(B)/$(MISSIONPACK)/game/ai_dmq3.o \
-  $(B)/$(MISSIONPACK)/game/ai_main.o \
-  $(B)/$(MISSIONPACK)/game/ai_team.o \
-  $(B)/$(MISSIONPACK)/game/ai_vcmd.o \
   $(B)/$(MISSIONPACK)/game/bg_misc.o \
   $(B)/$(MISSIONPACK)/game/bg_pmove.o \
   $(B)/$(MISSIONPACK)/game/bg_slidemove.o \
   $(B)/$(MISSIONPACK)/game/bg_lib.o \
   $(B)/$(MISSIONPACK)/game/g_active.o \
   $(B)/$(MISSIONPACK)/game/g_arenas.o \
-  $(B)/$(MISSIONPACK)/game/g_bot.o \
   $(B)/$(MISSIONPACK)/game/g_client.o \
   $(B)/$(MISSIONPACK)/game/g_cmds.o \
   $(B)/$(MISSIONPACK)/game/g_combat.o \
@@ -2773,9 +2689,6 @@ $(B)/client/%.o: $(SDIR)/%.c
 $(B)/client/%.o: $(CMDIR)/%.c
 	$(DO_CC)
 
-$(B)/client/%.o: $(BLIBDIR)/%.c
-	$(DO_BOT_CC)
-
 $(B)/client/%.o: $(OGGDIR)/src/%.c
 	$(DO_CC)
 
@@ -2859,9 +2772,6 @@ $(B)/ded/%.o: $(CMDIR)/%.c
 
 $(B)/ded/%.o: $(ZDIR)/%.c
 	$(DO_DED_CC)
-
-$(B)/ded/%.o: $(BLIBDIR)/%.c
-	$(DO_BOT_CC)
 
 $(B)/ded/%.o: $(SYSDIR)/%.c
 	$(DO_DED_CC)
